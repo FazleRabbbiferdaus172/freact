@@ -1,4 +1,9 @@
-console.log("hello world")
-const element = <h1 title="foo">Hello</h1>
+const element = React.createElement(
+    "h1",
+    {
+        title: "freact"
+    },
+    "Hello Freact"
+)
 const container = document.getElementById("app")
 ReactDOM.render(element, container)
