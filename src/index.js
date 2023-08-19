@@ -1,12 +1,12 @@
-// React.createElement creates an object from its arguments. Besides some validations, that’s all it does. So we will replace the function call with its output 
+// React.createElement creates an object from its arguments. Besides some validations, that’s all it does. So we will replace the function call with its output
 const element = {
-    type: "h1",
-    props: {
-        title: "freact",
-        children: "Hello Freact",
-    },
+  type: "h1",
+  props: {
+    title: "freact",
+    children: "Hello Freact",
+  },
 };
-////////////// React.createelement replaced
+////////////// React.createElement replaced
 
 const container = document.getElementById("app");
 
