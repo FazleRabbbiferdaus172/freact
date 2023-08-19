@@ -6,5 +6,15 @@ const element = {
         children: "Hello Freact",
     },
 };
+////////////// React.createelement replaced
+
 const container = document.getElementById("app");
-ReactDOM.render(element, container);
+
+// Now we replace ReactDOM.render() function
+const node = document.createElement(element.type);
+node["title"] = element.props.title;
+const children = document.createTextNode("");
+children["nodeValue"] = element.props.children;
+node.appendChild(children);
+container.appendChild(node);
+////////////// ReactDOM.render() replaced
