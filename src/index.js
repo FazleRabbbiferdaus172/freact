@@ -21,8 +21,15 @@ function createTextElement(text) {
   };
 }
 
+// [v.2] would be Freact.render()
+function render(element, container) {
+    const dom = document.createElement(element.type);
+    container.appendChild(dom);
+}
+
 const Freact = {
   createElement,
+  render,
 };
 
 // End of Freact library
@@ -31,7 +38,7 @@ const Freact = {
 // [v.1] React.createElement creates an object from its arguments. Besides some validations, that’s all it does. So we will replace the function call with its output
 // [v.2] Now replacing v.1 version of js to calling Freact.createElement() with jsx
 
-/** @jsx Didact.createElement */
+/** @jsx Freact.createElement */
 const element = (
   <div id="freact">
     <h1>Hello Freact</h1>
@@ -52,5 +59,6 @@ const container = document.getElementById("app");
 // children["nodeValue"] = element.props.children;
 // node.appendChild(children);
 // container.appendChild(node);
+Freact.render(element, container)
 
 ////////////// ReactDOM.render() replaced
