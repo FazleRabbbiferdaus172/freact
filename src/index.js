@@ -1,3 +1,21 @@
+// [v.3] optimizaation of frecat.render recurssion as it will block main thread until render ends.
+let nextUnitOfWork = null;
+
+function performUnitOfWork(nextUnitOfWork) {
+
+}
+
+function workLoop(deadline) {
+  let shouldYield = false;
+  while (nextUnitOfWork && !shouldYield) {
+    nextUnitOfWork  = performUnitOfWork(nextUnitOfWork);
+    shouldYield = deadline.timeRemaining() < 1;
+  }
+  requestIdleCallback(workLoop);
+}
+
+requestIdleCallback(workLoop);
+
 // [v.2] would be Freact.createElement(), returns just a object as expected from react.createElement. also createTextElement is implemented for the childen those are primitive type
 function createElement(type, props, ...children) {
   return {
