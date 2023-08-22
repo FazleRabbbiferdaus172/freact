@@ -1,0 +1,34 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Transpiled output
+dist/
+
+# Editor-specific files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+
+# Build output
+build/
+out/
+
+# Environment files
+.env
+
+# Logs
+logs/
+*.log
+
+# Compiled binaries or artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Mac-specific
+.DS_Store
+
