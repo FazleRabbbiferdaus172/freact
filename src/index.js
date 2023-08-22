@@ -1,8 +1,55 @@
 // [v.3] optimizaation of frecat.render recurssion as it will block main thread until render ends.
 let nextUnitOfWork = null;
 
-function performUnitOfWork(nextUnitOfWork) {
+function performUnitOfWork(fiber) {
 
+  // step 1: add a dom node
+  if (!fiber.dom) {
+    fiber.dom = createDOM(fiber);
+  }
+
+  if (fiber.parent) {
+    fiber.parent.dom.appendChild(fiber.dom);
+  }
+
+  // create new fibers
+  const elements = fiber.props.children;
+  let index = 0;
+  let prevSibling = null;
+
+  while (index < elements.length) {
+    const element = elements[index];
+
+    const newFiber = {
+      type: element.type,
+      props: element.props,
+      parent: fiber,
+      dom: null,
+    };
+
+    if (index === 0) {
+      fiber.child = newFiber;
+    }
+    else {
+      prevSibling.sibling = newFiber;
+    }
+
+    prevSibling = newFiber;
+    index++;
+  }
+
+  // return next unit of work
+
+  if (fiber.child) {
+    return fiber.child;
+  }
+  let nextFiber = fiber;
+  while (nextFiber) {
+    if (nextFiber.sibling) {
+      return nextFiber.sibling;
+    }
+    nextFiber = nextFiber.parent;
+  }
 }
 
 function workLoop(deadline) {
@@ -40,25 +87,32 @@ function createTextElement(text) {
   };
 }
 
-// [v.2] would be Freact.render()
-function render(element, container) {
+// [v.3] optimizezed render function with fiber tree datastructure, each node of fiber tree has link to it first child, parent and sibling. 
+function createDOM(fiber, container) {
   const dom =
-    element.type === "TEXT_ELEMENT"
+    fiber.type === "TEXT_ELEMENT"
       ? document.createTextNode("")
-      : document.createElement(element.type);
+      : document.createElement(fiber.type);
 
   const isProperty = (key) => key !== "children";
 
   // [v.2] adding the appropiate props values of the node
-  Object.keys(element.props)
+  Object.keys(fiber.props)
     .filter(isProperty)
-    .forEach((name) => (dom[name] = element.props[name]));
+    .forEach((name) => (dom[name] = fiber.props[name]));
 
-  element.props.children.forEach((child) => {
-    // [v.2] as this are child elements their container are it's parents, that is why dom is passed as a parameter, as it is the parent element.
-    render(child, dom);
-  });
-  container.appendChild(dom);
+  return dom;
+}
+
+// [v.2] would be Freact.render()
+// [V.3] optimization with fiber tree datastructure
+function render(element, container) {
+  nextUnitOfWork = {
+    dom: container,
+    props: {
+      children: [element],
+    },
+  }
 }
 
 const Freact = {
