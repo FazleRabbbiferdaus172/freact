@@ -11,6 +11,7 @@ function workLoop(deadline) {
     nextUnitOfWork  = performUnitOfWork(nextUnitOfWork);
     shouldYield = deadline.timeRemaining() < 1;
   }
+  // this call ensures that the workloop will be called again when the main thread is idle
   requestIdleCallback(workLoop);
 }
 
