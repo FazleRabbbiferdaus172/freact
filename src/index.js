@@ -1,6 +1,23 @@
 // [v.3] optimizaation of frecat.render recurssion as it will block main thread until render ends.
 let nextUnitOfWork = null;
 
+// [v.4] commiting the dom to root
+function commitRoot() {
+   // adding nodes to root
+  commitWork(wipRoot.child);
+  wipRoot = null;  
+}
+
+function commitWork(fiber) {
+  if (!fiber) {
+    return
+  }
+  const domParent = fiber.parent.dom;
+  domParent.appendChild(fiber.dom);
+  commitWork(fiber.child);
+  commitWork(fiber.sibling);
+}
+
 function performUnitOfWork(fiber) {
 
   // step 1: add a dom node
@@ -9,9 +26,9 @@ function performUnitOfWork(fiber) {
   }
 
   // [v.4] refactor adding to dom as there might be interruption before dom is fully renderd and result in and incomplete state which is not desireable.
-  if (fiber.parent) {
-    fiber.parent.dom.appendChild(fiber.dom);
-  }
+  // if (fiber.parent) {
+  //   fiber.parent.dom.appendChild(fiber.dom);
+  // }
 
   // create new fibers
   const elements = fiber.props.children;
@@ -59,6 +76,11 @@ function workLoop(deadline) {
     nextUnitOfWork  = performUnitOfWork(nextUnitOfWork);
     shouldYield = deadline.timeRemaining() < 1;
   }
+
+  if (!nextUnitOfWork && wipRoot) {
+    commitRoot();
+  }
+
   // this call ensures that the workloop will be called again when the main thread is idle
   requestIdleCallback(workLoop);
 }
@@ -107,14 +129,18 @@ function createDOM(fiber, container) {
 
 // [v.2] would be Freact.render()
 // [V.3] optimization with fiber tree datastructure
+// [v.4] keeping track of root
 function render(element, container) {
-  nextUnitOfWork = {
+  wipRoot = {
     dom: container,
     props: {
       children: [element],
     },
-  }
+  };
+  nextUnitOfWork = wipRoot;
 }
+
+let wipRoot = null;
 
 const Freact = {
   createElement,
