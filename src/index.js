@@ -1,3 +1,5 @@
+// [v.5] will be adding methods for updating dom
+
 // [v.3] optimizaation of frecat.render recurssion as it will block main thread until render ends.
 let nextUnitOfWork = null;
 
