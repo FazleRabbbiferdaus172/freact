@@ -8,6 +8,7 @@ function performUnitOfWork(fiber) {
     fiber.dom = createDOM(fiber);
   }
 
+  // [v.4] refactor adding to dom as there might be interruption before dom is fully renderd and result in and incomplete state which is not desireable.
   if (fiber.parent) {
     fiber.parent.dom.appendChild(fiber.dom);
   }
