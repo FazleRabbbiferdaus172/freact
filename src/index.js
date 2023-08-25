@@ -7,6 +7,7 @@ let nextUnitOfWork = null;
 function commitRoot() {
    // adding nodes to root
   commitWork(wipRoot.child);
+  currentRoot = wipRoot;
   wipRoot = null;  
 }
 
@@ -138,11 +139,13 @@ function render(element, container) {
     props: {
       children: [element],
     },
+    alternate: currentRoot,
   };
   nextUnitOfWork = wipRoot;
 }
 
 let wipRoot = null;
+let currentRoot = null;
 
 const Freact = {
   createElement,
