@@ -1,3 +1,5 @@
+// [v.5] will be adding methods for updating dom
+
 // [v.3] optimizaation of frecat.render recurssion as it will block main thread until render ends.
 let nextUnitOfWork = null;
 
@@ -5,6 +7,7 @@ let nextUnitOfWork = null;
 function commitRoot() {
    // adding nodes to root
   commitWork(wipRoot.child);
+  currentRoot = wipRoot;
   wipRoot = null;  
 }
 
@@ -136,11 +139,13 @@ function render(element, container) {
     props: {
       children: [element],
     },
+    alternate: currentRoot,
   };
   nextUnitOfWork = wipRoot;
 }
 
 let wipRoot = null;
+let currentRoot = null;
 
 const Freact = {
   createElement,
