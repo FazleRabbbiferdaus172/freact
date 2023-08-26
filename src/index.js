@@ -12,10 +12,30 @@ function commitRoot() {
   wipRoot = null;  
 }
 
-
-
+const isProperty = key => key !== "children";
+const isNew = (prev, next) => key => prev[key] !== next[key];
+const isGone = (prev,next) => key => !(key in next);
 function updateDom(dom, prevProps, nextProps) {
   // update the props
+
+  // remove old properties
+  Object.keys(isProperty)
+    .filter(isProperty)
+    .filter(isGone(prevProps, nextProps))
+    .forEach(name => {
+      dom[name] = "";
+    });
+
+  // set new or changed properties
+  Object.keys(nextProps)
+    .filter(isProperty)
+    .filter(isNew(prevProps, nextProps))
+    .forEach(
+      name => {
+        dom[name] = nextProps[name];
+      }
+    );
+
 }
 
 function commitWork(fiber) {
