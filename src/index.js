@@ -6,15 +6,15 @@ let nextUnitOfWork = null;
 // [v.4] commiting the dom to root
 function commitRoot() {
   // adding nodes to root
-  deletions.forEach(commitWork)
+  deletions.forEach(commitWork);
   commitWork(wipRoot.child);
   currentRoot = wipRoot;
-  wipRoot = null;  
+  wipRoot = null;
 }
 
-const isProperty = key => key !== "children";
-const isNew = (prev, next) => key => prev[key] !== next[key];
-const isGone = (prev,next) => key => !(key in next);
+const isProperty = (key) => key !== "children";
+const isNew = (prev, next) => (key) => prev[key] !== next[key];
+const isGone = (prev, next) => (key) => !(key in next);
 function updateDom(dom, prevProps, nextProps) {
   // update the props
 
@@ -22,7 +22,7 @@ function updateDom(dom, prevProps, nextProps) {
   Object.keys(isProperty)
     .filter(isProperty)
     .filter(isGone(prevProps, nextProps))
-    .forEach(name => {
+    .forEach((name) => {
       dom[name] = "";
     });
 
@@ -30,30 +30,21 @@ function updateDom(dom, prevProps, nextProps) {
   Object.keys(nextProps)
     .filter(isProperty)
     .filter(isNew(prevProps, nextProps))
-    .forEach(
-      name => {
-        dom[name] = nextProps[name];
-      }
-    );
-
+    .forEach((name) => {
+      dom[name] = nextProps[name];
+    });
 }
 
 function commitWork(fiber) {
   if (!fiber) {
-    return
+    return;
   }
   const domParent = fiber.parent.dom;
   if (fiber.effectTag == "PLACEMENT" && fiber.dom != null) {
     domParent.appendChild(fiber.dom);
-  }
-  else if (fiber.effectTag === "UPDATE" && fiber.dom != null) {
-    updateDom(
-      fiber.dom,
-      fiber.alternate.props,
-      fiber.props,
-    );
-  }
-  else if (fiber.effectTag === "DELETION") {
+  } else if (fiber.effectTag === "UPDATE" && fiber.dom != null) {
+    updateDom(fiber.dom, fiber.alternate.props, fiber.props);
+  } else if (fiber.effectTag === "DELETION") {
     domParent.removeChild(fiber.dom);
   }
   commitWork(fiber.child);
@@ -61,7 +52,6 @@ function commitWork(fiber) {
 }
 
 function performUnitOfWork(fiber) {
-
   // step 1: add a dom node
   if (!fiber.dom) {
     fiber.dom = createDOM(fiber);
@@ -119,7 +109,7 @@ function reconcileChildren(wipFiber, elements) {
         effectTag: "UPDATE",
       };
     }
-    
+
     if (element && !sameType) {
       // add this node
       newFiber = {
@@ -129,14 +119,14 @@ function reconcileChildren(wipFiber, elements) {
         parent: wipFiber,
         alternate: null,
         effectTag: "PLACEMENT",
-      }
+      };
     }
 
     if (oldFiber && !sameType) {
       // delete the oldFiber's node
-      oldFiber.effectTag = "DELETION"
-      deletions.push(oldFiber)
-    } 
+      oldFiber.effectTag = "DELETION";
+      deletions.push(oldFiber);
+    }
 
     if (oldFiber) {
       oldFiber - oldFiber.sibling;
@@ -144,8 +134,7 @@ function reconcileChildren(wipFiber, elements) {
 
     if (index === 0) {
       fiber.child = newFiber;
-    }
-    else {
+    } else {
       prevSibling.sibling = newFiber;
     }
 
@@ -157,7 +146,7 @@ function reconcileChildren(wipFiber, elements) {
 function workLoop(deadline) {
   let shouldYield = false;
   while (nextUnitOfWork && !shouldYield) {
-    nextUnitOfWork  = performUnitOfWork(nextUnitOfWork);
+    nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
     shouldYield = deadline.timeRemaining() < 1;
   }
 
@@ -194,7 +183,7 @@ function createTextElement(text) {
   };
 }
 
-// [v.3] optimizezed render function with fiber tree datastructure, each node of fiber tree has link to it first child, parent and sibling. 
+// [v.3] optimizezed render function with fiber tree datastructure, each node of fiber tree has link to it first child, parent and sibling.
 function createDOM(fiber, container) {
   const dom =
     fiber.type === "TEXT_ELEMENT"
