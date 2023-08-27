@@ -78,7 +78,7 @@ function performUnitOfWork(fiber) {
   if (isFunctionComponent) {
     updateFunctionComponent(fiber);
   } else {
-    updateHostcomponent(fiber)
+    updateHostcomponent(fiber);
   }
 
   // return next unit of work
@@ -96,7 +96,8 @@ function performUnitOfWork(fiber) {
 }
 
 function updateFunctionComponent(fiber) {
-  // TODO
+  const children = [fiber.type(fiber.props)];
+  reconcileChildren(fiber, children);
 }
 
 function updateHostcomponent(fiber) {
