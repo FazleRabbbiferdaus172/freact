@@ -260,7 +260,6 @@ const element = (
 );
 
 
-/** @jsx Freact.createElement */
 function AppFunctionComponent(props) {
   return <h1>Hi, {props.name}</h1>
 }
