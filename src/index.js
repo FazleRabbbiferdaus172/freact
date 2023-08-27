@@ -74,18 +74,12 @@ function commitWork(fiber) {
 
 function performUnitOfWork(fiber) {
   // step 1: add a dom node
-  if (!fiber.dom) {
-    fiber.dom = createDOM(fiber);
+  const isFunctionComponent = fiber.type instanceof Function;
+  if (isFunctionComponent) {
+    updateFunctionComponent(fiber);
+  } else {
+    updateHostcomponent(fiber)
   }
-
-  // [v.4] refactor adding to dom as there might be interruption before dom is fully renderd and result in and incomplete state which is not desireable.
-  // if (fiber.parent) {
-  //   fiber.parent.dom.appendChild(fiber.dom);
-  // }
-
-  // create new fibers
-  const elements = fiber.props.children;
-  reconcileChildren(fiber, elements);
 
   // return next unit of work
 
@@ -99,6 +93,25 @@ function performUnitOfWork(fiber) {
     }
     nextFiber = nextFiber.parent;
   }
+}
+
+function updateFunctionComponent(fiber) {
+  // TODO
+}
+
+function updateHostcomponent(fiber) {
+  if (!fiber.dom) {
+    fiber.dom = createDOM(fiber);
+  }
+
+  // [v.4] refactor adding to dom as there might be interruption before dom is fully renderd and result in and incomplete state which is not desireable.
+  // if (fiber.parent) {
+  //   fiber.parent.dom.appendChild(fiber.dom);
+  // }
+
+  // create new fibers
+  const elements = fiber.props.children;
+  reconcileChildren(fiber, elements);
 }
 
 function reconcileChildren(wipFiber, elements) {
@@ -259,12 +272,11 @@ const element = (
   </div>
 );
 
-
 function AppFunctionComponent(props) {
-  return <h1>Hi, {props.name}</h1>
+  return <h1>Hi, {props.name}</h1>;
 }
 
-const element2 = <App name="Freact"/>
+const element2 = <App name="Freact" />;
 
 ////////////// React.createElement replaced
 
