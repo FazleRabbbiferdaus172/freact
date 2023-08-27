@@ -249,6 +249,7 @@ const Freact = {
 
 // [v.1] React.createElement creates an object from its arguments. Besides some validations, that’s all it does. So we will replace the function call with its output
 // [v.2] Now replacing v.1 version of js to calling Freact.createElement() with jsx
+// [v.3] introduction of function components.
 
 /** @jsx Freact.createElement */
 const element = (
@@ -257,6 +258,14 @@ const element = (
     <h2 />
   </div>
 );
+
+
+/** @jsx Freact.createElement */
+function AppFunctionComponent(props) {
+  return <h1>Hi, {props.name}</h1>
+}
+
+const element2 = <App name="Freact"/>
 
 ////////////// React.createElement replaced
 
@@ -272,5 +281,6 @@ const container = document.getElementById("app");
 // node.appendChild(children);
 // container.appendChild(node);
 Freact.render(element, container);
+Freact.render(element2, container);
 
 ////////////// ReactDOM.render() replaced
