@@ -74,18 +74,12 @@ function commitWork(fiber) {
 
 function performUnitOfWork(fiber) {
   // step 1: add a dom node
-  if (!fiber.dom) {
-    fiber.dom = createDOM(fiber);
+  const isFunctionComponent = fiber.type instanceof Function;
+  if (isFunctionComponent) {
+    updateFunctionComponent(fiber);
+  } else {
+    updateHostcomponent(fiber);
   }
-
-  // [v.4] refactor adding to dom as there might be interruption before dom is fully renderd and result in and incomplete state which is not desireable.
-  // if (fiber.parent) {
-  //   fiber.parent.dom.appendChild(fiber.dom);
-  // }
-
-  // create new fibers
-  const elements = fiber.props.children;
-  reconcileChildren(fiber, elements);
 
   // return next unit of work
 
@@ -99,6 +93,26 @@ function performUnitOfWork(fiber) {
     }
     nextFiber = nextFiber.parent;
   }
+}
+
+function updateFunctionComponent(fiber) {
+  const children = [fiber.type(fiber.props)];
+  reconcileChildren(fiber, children);
+}
+
+function updateHostcomponent(fiber) {
+  if (!fiber.dom) {
+    fiber.dom = createDOM(fiber);
+  }
+
+  // [v.4] refactor adding to dom as there might be interruption before dom is fully renderd and result in and incomplete state which is not desireable.
+  // if (fiber.parent) {
+  //   fiber.parent.dom.appendChild(fiber.dom);
+  // }
+
+  // create new fibers
+  const elements = fiber.props.children;
+  reconcileChildren(fiber, elements);
 }
 
 function reconcileChildren(wipFiber, elements) {
@@ -249,6 +263,7 @@ const Freact = {
 
 // [v.1] React.createElement creates an object from its arguments. Besides some validations, that’s all it does. So we will replace the function call with its output
 // [v.2] Now replacing v.1 version of js to calling Freact.createElement() with jsx
+// [v.3] introduction of function components.
 
 /** @jsx Freact.createElement */
 const element = (
@@ -257,6 +272,12 @@ const element = (
     <h2 />
   </div>
 );
+
+function AppFunctionComponent(props) {
+  return <h1>Hi, {props.name}</h1>;
+}
+
+const element2 = <App name="Freact" />;
 
 ////////////// React.createElement replaced
 
@@ -272,5 +293,6 @@ const container = document.getElementById("app");
 // node.appendChild(children);
 // container.appendChild(node);
 Freact.render(element, container);
+Freact.render(element2, container);
 
 ////////////// ReactDOM.render() replaced
