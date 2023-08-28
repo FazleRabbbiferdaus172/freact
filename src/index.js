@@ -56,17 +56,30 @@ function updateDom(dom, prevProps, nextProps) {
     });
 }
 
+function commitDeletion(fiber, domParent) {
+  if (fiber.dom) {
+    domParent.removeChild(fiber.dom);
+  }
+  else {
+    commitDeletion(fiber.child, domParent);
+  }
+}
+
 function commitWork(fiber) {
   if (!fiber) {
     return;
   }
-  const domParent = fiber.parent.dom;
+  let domParentFiber = fiber.parent;
+  while (!domParentFiber.dom) {
+    domParentFiber = domParentFiber.parent;
+  }
+  const domParent = domParentFiber.dom;
   if (fiber.effectTag == "PLACEMENT" && fiber.dom != null) {
     domParent.appendChild(fiber.dom);
   } else if (fiber.effectTag === "UPDATE" && fiber.dom != null) {
     updateDom(fiber.dom, fiber.alternate.props, fiber.props);
   } else if (fiber.effectTag === "DELETION") {
-    domParent.removeChild(fiber.dom);
+    commitDeletion(fiber, domParent);
   }
   commitWork(fiber.child);
   commitWork(fiber.sibling);
@@ -111,8 +124,7 @@ function updateHostcomponent(fiber) {
   // }
 
   // create new fibers
-  const elements = fiber.props.children;
-  reconcileChildren(fiber, elements);
+  reconcileChildren(fiber, fiber.props.children);
 }
 
 function reconcileChildren(wipFiber, elements) {
@@ -277,11 +289,12 @@ function AppFunctionComponent(props) {
   return <h1>Hi, {props.name}</h1>;
 }
 
-const element2 = <App name="Freact" />;
+const element2 = <AppFunctionComponent name="Freact"/>;
 
 ////////////// React.createElement replaced
 
 const container = document.getElementById("app");
+const container2 = document.getElementById("app2");
 
 // [v.1] Now we replace ReactDOM.render() function
 // [v.2] Now calling Freact.render instead of ReactDOM.render
@@ -293,6 +306,6 @@ const container = document.getElementById("app");
 // node.appendChild(children);
 // container.appendChild(node);
 Freact.render(element, container);
-Freact.render(element2, container);
+Freact.render(element2, container2);
 
 ////////////// ReactDOM.render() replaced
