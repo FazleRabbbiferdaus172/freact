@@ -1,5 +1,6 @@
 // [v.5] will be adding methods for updating dom
 // [v.6] implemetation of functional components
+// [v.7] implementation of hooks
 
 // [v.3] optimizaation of frecat.render recurssion as it will block main thread until render ends.
 let nextUnitOfWork = null;
@@ -270,6 +271,7 @@ let deletions = null;
 const Freact = {
   createElement,
   render,
+  useState,
 };
 
 // End of Freact library
@@ -286,11 +288,14 @@ const element = (
   </div>
 );
 
-function AppFunctionComponent(props) {
-  return <h1>Hi, {props.name}</h1>;
+function AppFunctionComponent() {
+  const [state, setState] = Freact.useState(1);
+  return (
+    <h1 onClick={() => setState(c => c +1 )}>Freact Counts, {state}</h1>
+  );
 }
 
-const element2 = <AppFunctionComponent name="Freact"/>;
+const element2 = <AppFunctionComponent/>;
 
 ////////////// React.createElement replaced
 
