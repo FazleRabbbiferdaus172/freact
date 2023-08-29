@@ -1,4 +1,6 @@
 // [v.5] will be adding methods for updating dom
+// [v.6] implemetation of functional components
+// [v.7] implementation of hooks
 
 // [v.3] optimizaation of frecat.render recurssion as it will block main thread until render ends.
 let nextUnitOfWork = null;
@@ -108,9 +110,48 @@ function performUnitOfWork(fiber) {
   }
 }
 
+let wipFiber = null;
+let hookIndex = null;
+
 function updateFunctionComponent(fiber) {
+  wipFiber = fiber;
+  hookIndex = 0;
+  wipFiber.hooks = [];
   const children = [fiber.type(fiber.props)];
   reconcileChildren(fiber, children);
+}
+
+function useState(initial) {
+  // implement useState
+  const oldHook = wipFiber.alternate && 
+    wipFiber.alternate.hooks &&
+    wipFiber.alternate.hooks &&
+    wipFiber.alternate.hook[hookIndex];
+  const hook = {
+    state: oldHook ? oldHook.state : initial,
+    queue: [],
+  };
+
+  const actions = oldHook ? oldHook.queue : [];
+  actions.forEach(
+    action => {
+      hook.state = action(hook.state);
+    }
+  );
+
+  const setState = action => {
+    hook.queue.push(action);
+    wipRoot = {
+      dom: currentRoot.dom,
+      props: currentRoot.props,
+      alternate: currentRoot,
+    };
+    nextUnitOfWork = wipRoot;
+    deletions = [];
+  };
+  wipFiber.hooks.push(hook);
+  hookIndex++;
+  return [hook.state, setState];
 }
 
 function updateHostcomponent(fiber) {
@@ -269,6 +310,7 @@ let deletions = null;
 const Freact = {
   createElement,
   render,
+  useState,
 };
 
 // End of Freact library
@@ -285,11 +327,14 @@ const element = (
   </div>
 );
 
-function AppFunctionComponent(props) {
-  return <h1>Hi, {props.name}</h1>;
+function AppFunctionComponent() {
+  const [state, setState] = Freact.useState(1);
+  return (
+    <h1 onClick={() => setState(c => c +1)}>Freact Counts, {state}</h1>
+  );
 }
 
-const element2 = <AppFunctionComponent name="Freact"/>;
+const element2 = <AppFunctionComponent/>;
 
 ////////////// React.createElement replaced
 
