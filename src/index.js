@@ -127,7 +127,7 @@ function useState(initial) {
   const oldHook = wipFiber.alternate && 
     wipFiber.alternate.hooks &&
     wipFiber.alternate.hooks &&
-    wipFiber.alternate.hook[hookIndex];
+    wipFiber.alternate.hooks[hookIndex];
   const hook = {
     state: oldHook ? oldHook.state : initial,
     queue: [],
@@ -279,12 +279,7 @@ function createDOM(fiber, container) {
       ? document.createTextNode("")
       : document.createElement(fiber.type);
 
-  const isProperty = (key) => key !== "children";
-
-  // [v.2] adding the appropiate props values of the node
-  Object.keys(fiber.props)
-    .filter(isProperty)
-    .forEach((name) => (dom[name] = fiber.props[name]));
+  updateDom(dom, {}, fiber.props)
 
   return dom;
 }
