@@ -1,6 +1,7 @@
 // [v.5] will be adding methods for updating dom
 // [v.6] implemetation of functional components
 // [v.7] implementation of hooks
+// TODO: hooks bug hunt
 
 // [v.3] optimizaation of frecat.render recurssion as it will block main thread until render ends.
 let nextUnitOfWork = null;
