@@ -16,7 +16,7 @@ function commitRoot() {
 }
 
 // helper methods to  check update type of Props
-const isEvent = (keu) => key.startsWith("on");
+const isEvent = (key) => key.startsWith("on");
 const isProperty = (key) => key !== "children";
 const isNew = (prev, next) => (key) => prev[key] !== next[key];
 const isGone = (prev, next) => (key) => !(key in next);
