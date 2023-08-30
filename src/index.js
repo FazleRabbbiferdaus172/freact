@@ -1,6 +1,7 @@
 // [v.5] will be adding methods for updating dom
 // [v.6] implemetation of functional components
 // [v.7] implementation of hooks
+// [v.8] hooks bug hunt
 
 // [v.3] optimizaation of frecat.render recurssion as it will block main thread until render ends.
 let nextUnitOfWork = null;
@@ -15,7 +16,7 @@ function commitRoot() {
 }
 
 // helper methods to  check update type of Props
-const isEvent = (keu) => key.startsWith("on");
+const isEvent = (key) => key.startsWith("on");
 const isProperty = (key) => key !== "children";
 const isNew = (prev, next) => (key) => prev[key] !== next[key];
 const isGone = (prev, next) => (key) => !(key in next);
@@ -126,7 +127,7 @@ function useState(initial) {
   const oldHook = wipFiber.alternate && 
     wipFiber.alternate.hooks &&
     wipFiber.alternate.hooks &&
-    wipFiber.alternate.hook[hookIndex];
+    wipFiber.alternate.hooks[hookIndex];
   const hook = {
     state: oldHook ? oldHook.state : initial,
     queue: [],
@@ -278,12 +279,7 @@ function createDOM(fiber, container) {
       ? document.createTextNode("")
       : document.createElement(fiber.type);
 
-  const isProperty = (key) => key !== "children";
-
-  // [v.2] adding the appropiate props values of the node
-  Object.keys(fiber.props)
-    .filter(isProperty)
-    .forEach((name) => (dom[name] = fiber.props[name]));
+  updateDom(dom, {}, fiber.props)
 
   return dom;
 }
