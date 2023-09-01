@@ -3,6 +3,7 @@
 // [v.7] implementation of hooks
 // [v.8] hooks bug hunt
 // [v.9] Till now although there are 2 freact elements, containers and reender call still the result shows a single dom element
+// [var.10] Currently [v.9] is sovled but another problem arises as now hooks doesn't seem to work correctly, need to fix
 
 // [v.3] optimizaation of frecat.render recurssion as it will block main thread until render ends.
 let nextUnitOfWork = null;
@@ -235,6 +236,12 @@ function reconcileChildren(wipFiber, elements) {
 
 function workLoop(deadline) {
   let shouldYield = false;
+
+  if (!nextUnitOfWork && wipList) {
+    wipRoot = wipList.shift();
+    nextUnitOfWork = wipRoot;
+  }
+
   while (nextUnitOfWork && !shouldYield) {
     nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
     shouldYield = deadline.timeRemaining() < 1;
@@ -289,7 +296,8 @@ function createDOM(fiber, container) {
 // [V.3] optimization with fiber tree datastructure
 // [v.4] keeping track of root
 function render(element, container) {
-  wipRoot = {
+  let tWipRoot;
+  tWipRoot = {
     dom: container,
     props: {
       children: [element],
@@ -297,12 +305,13 @@ function render(element, container) {
     alternate: currentRoot,
   };
   deletions = [];
-  nextUnitOfWork = wipRoot;
+  wipList.push(tWipRoot);
 }
 
 let wipRoot = null;
 let currentRoot = null;
 let deletions = null;
+let wipList = []
 
 const Freact = {
   createElement,
@@ -320,14 +329,13 @@ const Freact = {
 const element = (
   <div id="freact">
     <h1>Hello Freact</h1>
-    <h2 />
   </div>
 );
 
 function AppFunctionComponent() {
   const [state, setState] = Freact.useState(1);
   return (
-    <h1 onClick={() => setState(c => c +1)}>Freact Counts, {state}</h1>
+    <h6 onClick={() => setState(c => c +1)}>Freact Counts, {state}</h6>
   );
 }
 
