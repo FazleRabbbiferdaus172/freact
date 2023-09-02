@@ -64,8 +64,7 @@ function updateDom(dom, prevProps, nextProps) {
 function commitDeletion(fiber, domParent) {
   if (fiber.dom) {
     domParent.removeChild(fiber.dom);
-  }
-  else {
+  } else {
     commitDeletion(fiber.child, domParent);
   }
 }
@@ -126,7 +125,8 @@ function updateFunctionComponent(fiber) {
 
 function useState(initial) {
   // implement useState
-  const oldHook = wipFiber.alternate && 
+  const oldHook =
+    wipFiber.alternate &&
     wipFiber.alternate.hooks &&
     wipFiber.alternate.hooks &&
     wipFiber.alternate.hooks[hookIndex];
@@ -136,13 +136,11 @@ function useState(initial) {
   };
 
   const actions = oldHook ? oldHook.queue : [];
-  actions.forEach(
-    action => {
-      hook.state = action(hook.state);
-    }
-  );
+  actions.forEach((action) => {
+    hook.state = action(hook.state);
+  });
 
-  const setState = action => {
+  const setState = (action) => {
     hook.queue.push(action);
     wipRoot = {
       dom: currentRoot.dom,
@@ -237,8 +235,8 @@ function reconcileChildren(wipFiber, elements) {
 function workLoop(deadline) {
   let shouldYield = false;
 
-  if (!nextUnitOfWork && wipList) {
-    wipRoot = wipList.shift();
+  if (!nextUnitOfWork && wipQueue) {
+    wipRoot = wipQueue.shift();
     nextUnitOfWork = wipRoot;
   }
 
@@ -287,7 +285,7 @@ function createDOM(fiber, container) {
       ? document.createTextNode("")
       : document.createElement(fiber.type);
 
-  updateDom(dom, {}, fiber.props)
+  updateDom(dom, {}, fiber.props);
 
   return dom;
 }
@@ -305,13 +303,13 @@ function render(element, container) {
     alternate: currentRoot,
   };
   deletions = [];
-  wipList.push(tWipRoot);
+  wipQueue.push(tWipRoot);
 }
 
 let wipRoot = null;
 let currentRoot = null;
 let deletions = null;
-let wipList = []
+let wipQueue = [];
 
 const Freact = {
   createElement,
@@ -334,12 +332,10 @@ const element = (
 
 function AppFunctionComponent() {
   const [state, setState] = Freact.useState(1);
-  return (
-    <h6 onClick={() => setState(c => c +1)}>Freact Counts, {state}</h6>
-  );
+  return <h6 onClick={() => setState((c) => c + 1)}>Freact Counts, {state}</h6>;
 }
 
-const element2 = <AppFunctionComponent/>;
+const element2 = <AppFunctionComponent />;
 
 ////////////// React.createElement replaced
 
